@@ -4,10 +4,10 @@ import Link from 'next/link';
 import classNames from 'classnames';
 import { CreateList } from '@/components/CreateList';
 import { randomColor } from '@/utils/randomColor';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { gql } from 'graphql-request';
 import { client } from '@/lib/client';
-
+import { MY_EMAIL_KEY } from '@/constants/email';
 
 export type TodoList = {
   id: number;
@@ -16,18 +16,34 @@ export type TodoList = {
   email: string;
 };
 
+const GET_TODO_LISTS_QUERY = gql`
+  query GetTODOLists($email: String!) {
+    getTODOLists(email: $email) {
+      id
+      name
+    }
+  }
+`;
+
 const DELETE_TODO_LIST_MUTATION = gql`
   mutation DeleteTODOList($deleteTodoListId: Int!) {
     deleteTODOList(id: $deleteTodoListId)
   }
 `;
 
-type MyListsProps = {
-  list: TodoList[];
-};
+export function MyLists() {
+  const [todoLists, setTodoLists] = useState<TodoList[]>([]);
 
-export const MyLists = ({ list = [] }: MyListsProps) => {
-  const [todoLists, setTodoLists] = useState<TodoList[]>(list);
+  useEffect(() => {
+    client
+      .request<{ getTODOLists: TodoList[]; }>(GET_TODO_LISTS_QUERY, {
+        email: MY_EMAIL_KEY,
+      })
+      .then((data) => {
+        console.log(data);
+        setTodoLists(data.getTODOLists);
+      });
+  }, []);
 
   const onCreateHandler = (newTodoList: TodoList) => {
     setTodoLists([...todoLists, newTodoList]);
