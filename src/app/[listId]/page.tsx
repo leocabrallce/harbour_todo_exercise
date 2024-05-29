@@ -1,8 +1,8 @@
 import { Todos } from '@/components/Todos';
 
 type MyListPageMetadata = {
-  params: { listId: string };
-}
+  params: { listId: string; };
+};
 
 export async function generateMetadata({ params }: MyListPageMetadata) {
   return {
@@ -15,7 +15,7 @@ type MyListPageProps = MyListPageMetadata;
 
 
 export default async function MyListPage({ params: { listId } }: MyListPageProps) {
-  // TODO fetch list from server
+  // TODO fetch list from server using graphql
 
 
   return (
